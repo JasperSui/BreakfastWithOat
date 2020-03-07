@@ -55,7 +55,7 @@ def stock_pcs_check(view_func):
         # 如果該會員要買的數量為負數
         if data['number'] <= 0:
 
-            return JsonResponse({'status': is_success, 'errmsg': 'Please enter positive quantity.'})
+            return JsonResponse({'status': False, 'errmsg': 'Please enter positive quantity.'})
 
         # 如果庫存還夠就繼續執行 Function
         else:
