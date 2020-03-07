@@ -125,11 +125,6 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
             # 更新該 Product 的 stock_pcs
             product = Product.objects.select_for_update().get(id=current_product.id)
 
-            
-            if data['number'] <= 0 or data['number'] > product.stock_pcs:
-
-                return JsonResponse({'status': is_success, 'errmsg': 'Something wrong.'})
-                
             product.stock_pcs -= data['number']
             product.save()
 
