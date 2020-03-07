@@ -1,7 +1,7 @@
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-def SendEmailByGmail(sender_ac,  recipient, subject, content):
+def SendEmailBySendGrid(sender_ac,  recipient, subject, content):
 
     message = Mail(
         from_email=sender_ac,

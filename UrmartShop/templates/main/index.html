@@ -149,6 +149,13 @@
             </tbody>
           </table>
     </div>
+    <div class="container my-4" id="top-three-div">
+        <div class="row">
+            <button id="btn-get-top-three" type="button" class="btn btn-info">
+                　　Top 3　　
+            </button>
+        </div>
+    </div>
 
 </body>
 
@@ -225,8 +232,113 @@ $(document).ready(function () {
                     });
                 }
             })
-        
+     }); 
+
+     $("#btn-get-top-three").click(function(){
+        $.ajax({
+            url: "/api/get-top-three-product-detail-by-ajax/",
+            method: "POST",
+            data: {},
+            success: function(data) {
+                var first_product = data['first_product'];
+                var second_product = data['second_product'];
+                var third_product = data['third_product'];
+                if (first_product == null){
+                    first_product = {};
+                    first_product['product_id'] = "(從缺)";
+                    first_product['sum_qty'] = "(從缺)";
+                }
+                if (second_product == null){
+                    second_product = {};
+                    second_product['product_id'] = "(從缺)";
+                    second_product['sum_qty'] = "(從缺)";
+                }
+                if (third_product == null){
+                    third_product = {};
+                    third_product['product_id'] = "(從缺)";
+                    third_product['sum_qty'] = "(從缺)";
+                }
+
+                var temp_new_table = String.format(
+                    `
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Product ID</th>
+                            <th scope="col">Total Qty</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1st</th>
+                            <td>{0}</td>
+                            <td>{1}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2nd</th>
+                            <td>{2}</td>
+                            <td>{3}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3rd</th>
+                            <td>{4}</td>
+                            <td>{5}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    `
+                    , first_product['product_id'], first_product['sum_qty']
+                    , second_product['product_id'], second_product['sum_qty']
+                    , third_product['product_id'], third_product['sum_qty']
+                )
+                $("#top-three-div").append(temp_new_table);
+                console.log(data);
+
+            }
+        });
     }); 
 }); 
 </script>
 
+<script>
+    //可在Javascript中使用如同C#中的string.format
+//使用方式 : var fullName = String.format('Hello. My name is {0} {1}.', 'FirstName', 'LastName');
+String.format = function ()
+{
+    var s = arguments[0];
+    if (s == null) return "";
+    for (var i = 0; i < arguments.length - 1; i++)
+    {
+        var reg = getStringFormatPlaceHolderRegEx(i);
+        s = s.replace(reg, (arguments[i + 1] == null ? "" : arguments[i + 1]));
+    }
+    return cleanStringFormatResult(s);
+}
+//可在Javascript中使用如同C#中的string.format (對jQuery String的擴充方法)
+//使用方式 : var fullName = 'Hello. My name is {0} {1}.'.format('FirstName', 'LastName');
+String.prototype.format = function ()
+{
+    var txt = this.toString();
+    for (var i = 0; i < arguments.length; i++)
+    {
+        var exp = getStringFormatPlaceHolderRegEx(i);
+        txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    }
+    return cleanStringFormatResult(txt);
+}
+//讓輸入的字串可以包含{}
+function getStringFormatPlaceHolderRegEx(placeHolderIndex)
+{
+    return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
+}
+//當format格式有多餘的position時，就不會將多餘的position輸出
+//ex:
+// var fullName = 'Hello. My name is {0} {1} {2}.'.format('firstName', 'lastName');
+// 輸出的 fullName 為 'firstName lastName', 而不會是 'firstName lastName {2}'
+function cleanStringFormatResult(txt)
+{
+    if (txt == null) return "";
+    return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
+}
+</script>

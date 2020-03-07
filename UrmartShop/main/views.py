@@ -8,7 +8,7 @@ from django.db import connection
 from django.db.models import Sum
 from email.mime.text import MIMEText
 from datetime import datetime
-from common.email import SendEmailByGmail
+from common.email import SendEmailBySendGrid
 import json
 import pdb
 import smtplib
@@ -132,7 +132,7 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
 
                 data['customer_id'] = 'Admin'
             
-            if data['number'] <= 0:
+            if data['number'] <= 0 or data['number'] > product.stock_pcs:
 
                 return JsonResponse({'status': is_success, 'errmsg': 'Something wrong.'})
 
@@ -187,11 +187,19 @@ def GenerateEachShopOrderDetail(request):
     
     if request.method == "POST":
 
+        # 寄件人
         sender_ac = 'jaspersui06@gmail.com'
+
+        # 收件人
         recipient = json.loads(request.body)['recipient']
+
+        # 目前時間
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # 主旨
         subject = '【Urmart Shop 最受用戶歡迎的商品前三名】 %s' % current_time
         
+        # 執行 Raw SQL
         cursor = connection.cursor()
         cursor.execute("""
                             SELECT `shop`.`name` AS `shop_name`,
@@ -208,6 +216,7 @@ def GenerateEachShopOrderDetail(request):
         query_result = cursor.fetchall()
         content = 'Hello,<br><br>以下為各館別截至 ' + current_time  + ' 的訂單詳情：<br><br>'
 
+        # 帶入資料產生 Email 內文
         for row in query_result:
 
             shop_name = row[0]
@@ -219,22 +228,32 @@ def GenerateEachShopOrderDetail(request):
         
         content += '<br>謝謝您的使用！'
 
-        if SendEmailByGmail(sender_ac, recipient, subject, content):
+        if SendEmailBySendGrid(sender_ac, recipient, subject, content):
 
             return JsonResponse({'status': True})
 
     return JsonResponse({'status': False})
 
-def GetTopThreeProductDetail(request):
+def GetTopThreeProductDetailViaEmail(request):
 
     if request.method == "POST":
 
+        # 寄件人
         sender_ac = 'jaspersui06@gmail.com'
+
+        # 收件人
         recipient = json.loads(request.body)['recipient']
+
+        # 目前時間
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # 主旨
         subject = '【Urmart Shop 最受用戶歡迎的商品前三名】 %s' % current_time
         
+        # 取得 Grouping 後的 Product 資料
         product_rank_list = Order.objects.values('product_id').annotate(sum_qty=Sum('qty')).order_by('-sum_qty')
+
+        # 帶入資料產生 Email 內文
         counter = 1
         content = 'Hello,<br><br>以下為目前截至 ' + current_time  + ' 的最受用戶歡迎的商品前三名：<br><br>'
 
@@ -249,8 +268,20 @@ def GetTopThreeProductDetail(request):
 
         content += '<br><br>謝謝您的使用！'
 
-        if SendEmailByGmail(sender_ac, recipient, subject, content):
+        # Call SendGrid API 來寄信
+        if SendEmailBySendGrid(sender_ac, recipient, subject, content):
 
             return JsonResponse({'status': True})
 
     return JsonResponse({'status': False})
+
+@ajax_required 
+def GetTopThreeProductDetailByAjax(request):
+
+    product_rank_list = Order.objects.values('product_id').annotate(sum_qty=Sum('qty')).order_by('-sum_qty')
+
+    first_product = product_rank_list[0] if len(product_rank_list) > 0 else None
+    second_product = product_rank_list[1] if len(product_rank_list) > 1 else None
+    third_product = product_rank_list[2] if len(product_rank_list) > 2 else None
+
+    return JsonResponse({'first_product': first_product, 'second_product': second_product, 'third_product': third_product})
