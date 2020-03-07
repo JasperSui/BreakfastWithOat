@@ -182,11 +182,10 @@ def GenerateEachShopOrderDetail(request):
     
     if request.method == "POST":
 
-        sender_ac = SystemCtrl.objects.get(id=1).value
-        sender_pw = SystemCtrl.objects.get(id=2).value
+        sender_ac = 'jaspersui06@gmail.com'
         recipient = json.loads(request.body)['recipient']
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        subject = '【Urmart Shop 銷售詳情報表】 %s' % current_time
+        subject = '【Urmart Shop 最受用戶歡迎的商品前三名】 %s' % current_time
         
         cursor = connection.cursor()
         cursor.execute("""
@@ -215,7 +214,7 @@ def GenerateEachShopOrderDetail(request):
         
         content += '<br>謝謝您的使用！'
 
-        if SendEmailByGmail(sender_ac, sender_pw, recipient, subject, content):
+        if SendEmailByGmail(sender_ac, recipient, subject, content):
 
             return JsonResponse({'status': True})
 
@@ -225,8 +224,7 @@ def GetTopThreeProductDetail(request):
 
     if request.method == "POST":
 
-        sender_ac = SystemCtrl.objects.get(id=1).value
-        sender_pw = SystemCtrl.objects.get(id=2).value
+        sender_ac = 'jaspersui06@gmail.com'
         recipient = json.loads(request.body)['recipient']
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         subject = '【Urmart Shop 最受用戶歡迎的商品前三名】 %s' % current_time
@@ -246,7 +244,7 @@ def GetTopThreeProductDetail(request):
 
         content += '<br><br>謝謝您的使用！'
 
-        if SendEmailByGmail(sender_ac, sender_pw, recipient, subject, content):
+        if SendEmailByGmail(sender_ac, recipient, subject, content):
 
             return JsonResponse({'status': True})
 

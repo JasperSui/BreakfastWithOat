@@ -1,17 +1,28 @@
-from email.mime.text import MIMEText
-import smtplib
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
-def SendEmailByGmail(sender_ac, sender_pw, recipient, subject, content):
+def SendEmailByGmail(sender_ac,  recipient, subject, content):
 
-    msg = MIMEText(content, 'html', 'utf-8')
-    msg['Subject'] = subject
-    msg['From'] = sender_ac
-    msg['To'] = recipient
+    message = Mail(
+        from_email=sender_ac,
+        to_emails=recipient,
+        subject=subject,
+        html_content=content
+    )
 
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    server.ehlo()
-    server.login(sender_ac, sender_pw)
-    server.send_message(msg)
-    server.quit()
+    try:
+        sg = SendGridAPIClient('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')
+
+        response = sg.send(message)
+
+        if (response.status_code == 202):
+
+            return True
+        
+        else:
+
+            return False
     
-    return True
+    except Exception as e:
+
+        print(e.message)
