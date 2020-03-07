@@ -75,16 +75,44 @@ WSGI_APPLICATION = 'UrmartShop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'urmartshop',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '167.71.195.145',
-        'PORT': '3306',
-    }
+if os_name == 'nt':
+
+    DATABASES = {
+                    'default': {
+                        'ENGINE': 'django.db.backends.mysql',
+                        'NAME': 'urmartshop',
+                        'USER': 'root',
+                        'PASSWORD': 'root',
+                        'HOST': '127.0.0.1',
+                        'PORT': '3306',
+                    }
+                }
+
+elif os_name == 'posix':
+
+    DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.mysql',
+                    'NAME': 'urmartshop',
+                    'USER': 'root',
+                    'PASSWORD': 'root',
+                    'HOST': '167.71.195.145',
+                    'PORT': '3306',
+                }
+
 }
+else:
+    
+    DATABASES = {
+                    'default': {
+                        'ENGINE': 'django.db.backends.mysql',
+                        'NAME': 'urmartshop',
+                        'USER': 'root',
+                        'PASSWORD': 'root',
+                        'HOST': '167.71.195.145',
+                        'PORT': '3306',
+                    }
+                }
 
 
 # Password validation
