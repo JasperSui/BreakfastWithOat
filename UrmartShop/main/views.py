@@ -124,6 +124,12 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
             # 以 Pessimistic 來鎖定 current row
             # 更新該 Product 的 stock_pcs
             product = Product.objects.select_for_update().get(id=current_product.id)
+
+            
+            if data['number'] <= 0 or data['number'] > product.stock_pcs:
+
+                return JsonResponse({'status': is_success, 'errmsg': 'Something wrong.'})
+                
             product.stock_pcs -= data['number']
             product.save()
 
@@ -131,10 +137,6 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
             if data['customer_id'] in (None, ''):
 
                 data['customer_id'] = 'Admin'
-            
-            if data['number'] <= 0 or data['number'] > product.stock_pcs:
-
-                return JsonResponse({'status': is_success, 'errmsg': 'Something wrong.'})
 
             order = Order(
                             product_id=product.id,
