@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Jasper">
+
+    <title>Urmart Shop</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/static/js/jquery-3.4.1.min.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row my-4 ">
+            <div class="col-md-4">
+            </div>
+            <div class="col-md-4 align-items-center justify-content-center div-wrapper d-flex">
+                <h1>
+                    UrmartShop
+                </h1>
+            </div>
+            <div class="col-md-4">
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row my-4">
+            <h3>
+                商品列表
+            </h3>
+        </div>
+        <div class="row my-4">
+            <form class="form-inline">
+                <div class="mb-2">
+                    <select id="form-select-product-id" class="form-control">
+                        <option value="" disabled selected>Select Product</option>
+                        {% for p in products %}
+                            <option value={{ p.id }}>{{ p.id }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mx-sm-4 mb-2">
+                    <input id="form-product-number" class="form-control" type="number" placeholder="數量">
+                </div>
+                <div class="mb-2">
+                    <button id="btn-send-order" type="button" class="btn btn-dark">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div class="ml-sm-5 mr-sm-3 mb-2">
+                    <input id="form-customer-id" class="form-control" type="text" placeholder="Customer ID">
+                </div>
+
+                <div class="mb-2 form-check">
+                    
+                    <input class="form-check-input" type="checkbox" id="form-is-vip">
+                    <label class="form-check-label" for="form-is-vip">
+                        是否為 VIP 身份
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Product ID</th>
+                <th scope="col">Stock Pcs</th>
+                <th scope="col">Price</th>
+                <th scope="col">Shop Name</th>
+                <th scope="col">VIP</th>
+                <th scope="col">Is Arrived</th>
+              </tr>
+            </thead>
+            <tbody">
+              {% for obj in products_is_arrived_list %}
+              <tr>
+                <th scope="row">{{ obj.0.id }}</th>
+                <td>{{ obj.0.stock_pcs }}</td>
+                <td>{{ obj.0.price }}</td>
+                <td>{{ obj.0.shop.name }}</td>
+                <td>
+                    <div class="input-group">
+                        <input class="input-group-text" type="checkbox" disabled
+                        {% if obj.0.vip %}
+                            checked 
+                        {% endif %}
+                        >
+                    </div>
+                </td>
+                <td>
+                    {% if obj.1 %}
+                        新貨已到！
+                    {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row mt-5 mb-3">
+            <h3>
+                訂單紀錄
+            </h3>
+        </div>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Product ID</th>
+                <th scope="col">Customer ID</th>
+                <th scope="col">Shop Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <th scope="row">{{ order.id }}</th>
+                <td>{{ order.product.id }}</td>
+                <td>{{ order.customer_id }}</td>
+                <td>{{ order.product.shop.name }}</td>
+                <td>{{ order.qty }}</td>
+                <td>{{ order.product.price }}</td>
+                <td>
+                    <button id="button-delete-order-{{ order.id }}"type="button" class="btn btn-danger btn-delete-order">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+
+</body>
+
+</html>
+
+<script>
+$(document).ready(function () {
+    $("#btn-send-order").click(function(){
+        var data =  {};
+        data["product_id"] = $("#form-select-product-id").val();
+        data["number"] = parseInt($("#form-product-number").val());
+        data["customer_id"] = $("#form-customer-id").val();
+        data["vip"] = ($('#form-is-vip').is(':checked') == true);
+        $.ajax({
+            url: "/api/send-order/",
+            method: "POST",
+            data: JSON.stringify(data),
+            success: function(data) {
+                var status = data["status"];
+                var errmsg = data["errmsg"];
+                if(status == false){
+                    Swal.fire({
+                            title: "Error !",
+                            text: errmsg,
+                            icon: 'error',
+                            confirmButtonText: 'Cool'
+                            })
+                }
+                else{
+                    Swal.fire({
+                            title: "Success !",
+                            text: 'Order is created!',
+                            icon: 'success',
+                            confirmButtonText: 'Cool'
+                            }).then((result) =>{
+                                location.reload();
+                            })
+                };
+                console.log(data);
+            }
+        });
+    }); 
+
+    $(".btn-delete-order").click(function(){
+        var order_id = $(this).attr('id').split('-').pop();
+        Swal.fire({
+            title: 'Are you sure to delete order ' + order_id + '?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value){
+                    $.ajax({
+                        url: "/api/delete-order/" + order_id,
+                        method: "POST",
+                        data: {},
+                        success: function(data) {
+                            var status = data["status"];
+                            if(status == true){
+                                Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Order ' + order_id + ' has been removed.',
+                                showConfirmButton: false,
+                                timer: 1000
+                                })
+                                setTimeout ( function(){location.reload();}, 1000 );
+                            };
+                            console.log(data);
+                        }
+                    });
+                }
+            })
+        
+    }); 
+}); 
+</script>
+
