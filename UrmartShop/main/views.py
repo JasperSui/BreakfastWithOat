@@ -250,6 +250,9 @@ def GetTopThreeProductDetailViaEmail(request):
         # 取得 Grouping 後的 Product 資料
         product_rank_list = Order.objects.values('product_id').annotate(sum_qty=Sum('qty')).order_by('-sum_qty')
 
+        # 只取前三個
+        product_rank_list = product_rank_list[0:3]
+
         # 帶入資料產生 Email 內文
         counter = 1
         content = 'Hello,<br><br>以下為目前截至 ' + current_time  + ' 的最受用戶歡迎的商品前三名：<br><br>'
@@ -275,7 +278,11 @@ def GetTopThreeProductDetailViaEmail(request):
 @ajax_required 
 def GetTopThreeProductDetailByAjax(request):
 
+    # 取得 Grouping 後的 Product 資料
     product_rank_list = Order.objects.values('product_id').annotate(sum_qty=Sum('qty')).order_by('-sum_qty')
+    
+    # 只取前三個
+    product_rank_list = product_rank_list[0:3]
 
     first_product = product_rank_list[0] if len(product_rank_list) > 0 else None
     second_product = product_rank_list[1] if len(product_rank_list) > 1 else None
