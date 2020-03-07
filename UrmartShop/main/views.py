@@ -134,7 +134,7 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
             
             if data['number'] <= 0:
 
-                return JsonResponse({'status': is_success})
+                return JsonResponse({'status': is_success, 'errmsg': 'Something wrong.'})
 
             order = Order(
                             product_id=product.id,
