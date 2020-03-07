@@ -81,11 +81,8 @@ DATABASES = {
         'NAME': 'urmartshop',
         'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
+        'HOST': '167.71.195.145',
         'PORT': '3306',
-        'TEST': {
-            'NAME': 'test_urmartshop'
-        }
     }
 }
 
@@ -114,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Taipei'
 
 USE_I18N = True
 
