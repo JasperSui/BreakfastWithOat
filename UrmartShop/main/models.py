@@ -138,11 +138,3 @@ class Shop(models.Model):
     class Meta:
         managed = False
         db_table = 'shop'
-
-class SystemCtrl(models.Model):
-    description = models.CharField(max_length=255)
-    value = models.CharField(max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'systemctrl'

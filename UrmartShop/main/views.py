@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from main.models import Product, Shop, Order, SystemCtrl
+from main.models import Product, Shop, Order
 from main.decorators import vip_required, ajax_required, stock_pcs_check
 from django.db import transaction
 from django.db import connection
