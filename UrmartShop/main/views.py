@@ -129,7 +129,12 @@ def SendOrder(request, data=None, current_product=None, *args, **kwargs):
 
             # 新增 Order
             if data['customer_id'] in (None, ''):
+
                 data['customer_id'] = 'Admin'
+            
+            if data['number'] <= 0:
+
+                return JsonResponse({'status': is_success})
 
             order = Order(
                             product_id=product.id,
