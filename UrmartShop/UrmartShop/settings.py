@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'UrmartShop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-if os_name == 'nt':
+if os.name == 'nt':
 
     DATABASES = {
                     'default': {
@@ -88,7 +88,7 @@ if os_name == 'nt':
                     }
                 }
 
-elif os_name == 'posix':
+elif os.name == 'posix':
 
     DATABASES = {
                 'default': {
@@ -102,7 +102,7 @@ elif os_name == 'posix':
 
 }
 else:
-    
+
     DATABASES = {
                     'default': {
                         'ENGINE': 'django.db.backends.mysql',
