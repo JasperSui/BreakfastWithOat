@@ -11,7 +11,7 @@ def SendEmailBySendGrid(sender_ac,  recipient, subject, content):
     )
 
     try:
-        sg = SendGridAPIClient('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')
+        sg = SendGridAPIClient('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')
 
         response = sg.send(message)
 
